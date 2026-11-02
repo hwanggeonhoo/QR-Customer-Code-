@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Pemesanan & Traceability Beras - PT. Sirtanio Organik Indonesia</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        sirtanio: {
+                            50: '#f2f8f4',
+                            100: '#e1f0e6',
+                            600: '#2e7d32',
+                            700: '#1b5e20',
+                            800: '#144518',
+                            earth: '#8D6E63',
+                            cream: '#FDFBF7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-sirtanio-50 text-gray-800 h-full flex flex-col antialiased">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-sirtanio-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-sirtanio-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-seedling text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-sirtanio-800 leading-tight">PT. Sirtanio Organik Indonesia</h1>
+                    <p class="text-xs text-sirtanio-600 font-medium tracking-wide">Pusat Beras Organik & Traceability Asli Banyuwangi</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="hidden md:flex space-x-1 bg-sirtanio-50 p-1 rounded-xl border border-sirtanio-100">
+                <button onclick="switchTab('catalog')" id="nav-catalog" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-sirtanio-700 bg-white shadow-xs">
+                    <i class="fa-solid fa-store mr-2"></i>Katalog Produk
+                </button>
+                <button onclick="switchTab('traceability')" id="nav-traceability" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-600 hover:text-sirtanio-700">
+                    <i class="fa-solid fa-map-location-dot mr-2"></i>Traceability Asal Beras
+                </button>
+                <button onclick="switchTab('orders')" id="nav-orders" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-600 hover:text-sirtanio-700">
+                    <i class="fa-solid fa-clock-rotate-left mr-2"></i>Riwayat & Reorder
+                </button>
+            </nav>
+
+            <!-- Cart & Mobile Menu Button -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openCartModal()" class="relative bg-sirtanio-100 hover:bg-sirtanio-600 hover:text-white text-sirtanio-800 p-3 rounded-xl transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="hidden sm:inline text-sm font-bold">Keranjang</span>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-amber-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
+                </button>
+                
+                <button onclick="toggleMobileMenu()" class="md:hidden p-3 rounded-xl bg-gray-100 text-gray-700">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('catalog'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-sirtanio-50 flex items-center text-sirtanio-800">
+                <i class="fa-solid fa-store mr-3 w-5"></i> Katalog Produk
+            </button>
+            <button onclick="switchTab('traceability'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-sirtanio-50 flex items-center text-gray-700">
+                <i class="fa-solid fa-map-location-dot mr-3 w-5"></i> Traceability Asal Beras
+            </button>
+            <button onclick="switchTab('orders'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-sirtanio-50 flex items-center text-gray-700">
+                <i class="fa-solid fa-clock-rotate-left mr-3 w-5"></i> Riwayat & Reorder
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- ================= CATALOG TAB ================= -->
+        <section id="tab-catalog" class="space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-sirtanio-800 to-sirtanio-600 rounded-3xl p-6 sm:p-10 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row justify-between items-center">
+                <div class="relative z-10 max-w-xl space-y-4">
+                    <span class="bg-emerald-500/30 text-emerald-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-400/30">
+                        100% Organik Tersertifikasi SNI
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">Kebaikan Alam Banyuwangi Langsung ke Meja Anda</h2>
+                    <p class="text-sirtanio-100 text-sm sm:text-base leading-relaxed">
+                        Diproduksi langsung oleh petani binaan PT. Sirtanio Organik Indonesia di Banyuwangi. Bebas pestisida kimia, kaya nutrisi, dan memiliki sistem pelacakan (traceability) asal sawah yang transparan.
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <button onclick="switchTab('traceability')" class="bg-white text-sirtanio-800 font-bold px-5 py-2.5 rounded-xl shadow hover:bg-sirtanio-50 transition-all text-sm">
+                            <i class="fa-solid fa-compass mr-2"></i> Lacak Asal Beras
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-6 md:mt-0 relative z-10 hidden sm:block">
+                    <div class="w-40 h-40 md:w-56 md:h-56 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 shadow-2xl">
+                        <i class="fa-solid fa-wheat-awn text-white text-6xl md:text-8xl animate-pulse"></i>
+                    </div>
+                </div>
+                <!-- Decorative circles -->
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-600/30 rounded-full blur-3xl"></div>
+            </div>
+
+            <!-- Filter Categories -->
+            <div class="flex items-center justify-between flex-wrap gap-4 pt-2">
+                <div>
+                    <h3 class="text-xl font-bold text-sirtanio-800">Pilihan Varian Beras Organik</h3>
+                    <p class="text-sm text-gray-500">Pilih beras berkualitas tinggi sesuai kebutuhan nutrisi keluarga</p>
+                </div>
+                <div class="flex items-center space-x-2 bg-white p-1 rounded-xl shadow-xs border border-sirtanio-100">
+                    <button onclick="filterProducts('all')" id="filter-all" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-sirtanio-600 text-white">Semua</button>
+                    <button onclick="filterProducts('Putih')" id="filter-Putih" class="px-4 py-2 rounded-lg text-xs font-medium text-gray-600 hover:text-sirtanio-600">Putih Organik</button>
+                    <button onclick="filterProducts('Merah')" id="filter-Merah" class="px-4 py-2 rounded-lg text-xs font-medium text-gray-600 hover:text-sirtanio-600">Beras Merah</button>
+                    <button onclick="filterProducts('Hitam')" id="filter-Hitam" class="px-4 py-2 rounded-lg text-xs font-medium text-gray-600 hover:text-sirtanio-600">Beras Hitam</button>
+                    <button onclick="filterProducts('Cokelat')" id="filter-Cokelat" class="px-4 py-2 rounded-lg text-xs font-medium text-gray-600 hover:text-sirtanio-600">Beras Cokelat</button>
+                </div>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Dynamically rendered via JS -->
+            </div>
+        </section>
+
+        <!-- ================= TRACEABILITY TAB ================= -->
+        <section id="tab-traceability" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-sirtanio-100 space-y-6">
+                <div class="max-w-2xl">
+                    <span class="text-sirtanio-600 font-bold text-xs uppercase tracking-wider bg-sirtanio-100 px-3 py-1 rounded-full">Transparansi Dari Sawah Ke Meja</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-sirtanio-800 mt-2">Sistem Pelacakan Asal Beras (Traceability)</h2>
+                    <p class="text-gray-600 text-sm mt-1">Masukkan Nomor Batch/Lot pada kemasan beras Sirtanio Anda atau pilih wilayah sentra produksi di Banyuwangi untuk melihat detail petani, kelompok tani, dan tanggal panen.</p>
+                </div>
+
+                <!-- Traceability Search Input -->
+                <div class="bg-sirtanio-50 p-4 sm:p-6 rounded-2xl border border-sirtanio-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="block text-sm font-bold text-gray-700">Pilih Wilayah Sawah / Masukkan Batch ID</label>
+                        <select id="trace-select" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sirtanio-600 font-medium">
+                            <option value="SRT-BWG-01">Klaster Rogojampi (Beras Putih Organik Mapan)</option>
+                            <option value="SRT-BWG-02">Klaster Srono (Beras Merah Organik Premium)</option>
+                            <option value="SRT-BWG-03">Klaster Cluring (Beras Hitam Organik Mentari)</option>
+                            <option value="SRT-BWG-04">Klaster Gambiran (Beras Cokelat Organik Nutri)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="runTraceability()" class="w-full bg-sirtanio-600 hover:bg-sirtanio-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-magnifying-glass-location"></i>
+                            <span>Lacak Sekarang</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Traceability Results Display -->
+                <div id="trace-result-container" class="space-y-6 pt-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ORDERS & REORDER TAB ================= -->
+        <section id="tab-orders" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-sirtanio-100 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-sirtanio-600 font-bold text-xs uppercase tracking-wider bg-sirtanio-100 px-3 py-1 rounded-full">Kelola Pembelian</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-sirtanio-800 mt-2">Riwayat Pesanan & Fitur Reorder Cepat</h2>
+                        <p class="text-gray-600 text-sm mt-1">Pesan ulang beras favorit Anda dalam satu klik dengan informasi batch dan asal usul yang tetap tersimpan.</p>
+                    </div>
+                    <div class="bg-sirtanio-50 px-4 py-3 rounded-2xl border border-sirtanio-100 text-center">
+                        <span class="text-xs text-gray-500 block">Total Pesanan Tercatat</span>
+                        <span id="total-orders-count" class="text-xl font-bold text-sirtanio-800">0</span>
+                    </div>
+                </div>
+
+                <!-- Orders List -->
+                <div id="orders-list-container" class="space-y-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-sirtanio-800 text-white mt-16 border-t border-sirtanio-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="space-y-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-sirtanio-600 rounded-xl flex items-center justify-center text-white">
+                        <i class="fa-solid fa-seedling text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">PT. Sirtanio Organik Indonesia</h3>
+                </div>
+                <p class="text-sirtanio-100 text-xs leading-relaxed">
+                    Pelopor pertanian organik berkelanjutan di Banyuwangi, Jawa Timur. Menghasilkan beras sehat berkualitas tinggi demi kesejahteraan petani dan kesehatan masyarakat.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm uppercase tracking-wider mb-3 text-emerald-300">Sentra Produksi & Alamat</h4>
+                <p class="text-sirtanio-100 text-xs leading-relaxed">
+                    <i class="fa-solid fa-location-dot mr-2 text-emerald-400"></i> Jl. Raya Srono - Rogojampi, Banyuwangi, Jawa Timur, Indonesia<br>
+                    <i class="fa-solid fa-envelope mr-2 text-emerald-400 mt-2"></i> info@sirtanio.co.id | support@sirtanio.id
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm uppercase tracking-wider mb-3 text-emerald-300">Komitmen Kami</h4>
+                <p class="text-sirtanio-100 text-xs leading-relaxed">
+                    100% Organik, Sertifikasi Lembaga Sertifikasi Organik (LSO), Mendukung kesejahteraan petani lokal melalui sistem <i>Fair Trade</i> dan pertanian ramah lingkungan.
+                </p>
+            </div>
+        </div>
+        <div class="bg-sirtanio-900 py-4 text-center text-xs text-sirtanio-200 border-t border-sirtanio-700/50">
+            &copy; 2026 PT. Sirtanio Organik Indonesia. All Rights Reserved. Simulasi Sistem Pemesanan & Traceability Beras.
+        </div>
+    </footer>
+
+    <!-- ================= MODAL: CART & CHECKOUT ================= -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-sirtanio-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-sirtanio-600 rounded-xl flex items-center justify-center text-white">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-sirtanio-800">Keranjang Belanja Beras</h3>
+                        <p class="text-xs text-gray-500">Periksa pesanan sebelum simulasi <i>checkout</i></p>
+                    </div>
+                </div>
+                <button onclick="closeCartModal()" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Cart Items) -->
+            <div id="cart-items-container" class="p-6 overflow-y-auto flex-1 space-y-4 max-h-[40vh]">
+                <!-- Cart items injected here -->
+            </div>
+
+            <!-- Modal Footer / Summary -->
+            <div class="p-6 border-t border-gray-100 bg-sirtanio-50/50 space-y-4">
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>Subtotal Produk</span>
+                        <span id="cart-subtotal" class="font-bold">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>Estimasi Ongkir (Banyuwangi & Sekitarnya)</span>
+                        <span class="font-bold">Rp 15.000</span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-sirtanio-800 pt-2 border-t border-gray-200">
+                        <span>Total Pembayaran</span>
+                        <span id="cart-total" class="text-emerald-700">Rp 0</span>
+                    </div>
+                </div>
+                <button onclick="checkoutCart()" class="w-full bg-sirtanio-600 hover:bg-sirtanio-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Proses Simulasi Pesanan</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: NOTIFICATION / SUCCESS ================= -->
+    <div id="notification-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
+            <div class="w-16 h-16 bg-emerald-100 text-sirtanio-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 id="notif-title" class="text-xl font-extrabold text-sirtanio-800">Pesanan Berhasil Dibuat!</h3>
+            <p id="notif-message" class="text-sm text-gray-600 leading-relaxed">
+                Simulasi pesanan beras Anda telah tercatat dalam sistem. Anda dapat melihat asal-usul sawah dan melakukan reorder kapan saja.
+            </p>
+            <div class="pt-2">
+                <button onclick="closeNotificationModal()" class="w-full bg-sirtanio-600 hover:bg-sirtanio-700 text-white font-bold py-3 rounded-xl transition-all">
+                    Mengerti & Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- DATA PRODUK BERAS SIRTANIO ORGANIK ---
+        const products = [
+            {
+                id: 'sirtanio-putih-premium',
+                name: 'Beras Putih Organik Sirtanio Premium',
+                category: 'Putih',
+                weight: '2 Kg',
+                price: 38000,
+                rating: 4.8,
+                sold: '1.2rb terjual',
+                imageBg: 'from-amber-50 to-orange-50',
+                textColor: 'text-amber-800',
+                badgeBg: 'bg-amber-100 text-amber-800',
+                badgeText: 'Putih Organik',
+                originCode: 'SRT-BWG-01',
+                originName: 'Klaster Rogojampi, Banyuwangi',
+                farmerGroup: 'Kelompok Tani Subur Makmur',
+                harvestDate: 'Oktober 2026',
+                description: 'Beras putih murni dibudidayakan tanpa pupuk kimia buatan. Memiliki tekstur pulen, aroma harum alami, dan aman untuk dikonsumsi seluruh anggota keluarga.'
+            },
+            {
+                id: 'sirtanio-merah-sehat',
+                name: 'Beras Merah Organik Sirtanio Sehat',
+                category: 'Merah',
+                weight: '1 Kg',
+                price: 25000,
+                rating: 4.9,
+                sold: '2.5rb terjual',
+                imageBg: 'from-rose-50 to-red-50',
+                textColor: 'text-rose-800',
+                badgeBg: 'bg-rose-100 text-rose-800',
+                badgeText: 'Beras Merah',
+                originCode: 'SRT-BWG-02',
+                originName: 'Klaster Srono, Banyuwangi',
+                farmerGroup: 'Kelompok Tani Tani Makmur Srono',
+                harvestDate: 'September 2026',
+                description: 'Kaya akan serat, vitamin B, dan zat besi. Sangat dianjurkan untuk diet sehat, penderita diabetes, dan penjaga kadar gula darah.'
+            },
+            {
+                id: 'sirtanio-hitam-special',
+                name: 'Beras Hitam Organik Sirtanio Mentari',
+                category: 'Hitam',
+                weight: '1 Kg',
+                price: 32000,
+                rating: 5.0,
+                sold: '3.1rb terjual',
+                imageBg: 'from-slate-900 to-zinc-800',
+                textColor: 'text-white',
+                badgeBg: 'bg-zinc-800 text-emerald-400',
+                badgeText: 'Beras Hitam',
+                originCode: 'SRT-BWG-03',
+                originName: 'Klaster Cluring, Banyuwangi',
+                farmerGroup: 'Gabungan Kelompok Tani (Gapoktan) Cluring Lestari',
+                harvestDate: 'Oktober 2026',
+                description: 'Sumber antioksidan (Anthocyanin) yang sangat tinggi. Berkhasiat menjaga kesehatan jantung, imunitas tubuh, dan memperlambat penuaan dini.'
+            },
+            {
+                id: 'sirtanio-cokelat-nutri',
+                name: 'Beras Cokelat Organik Sirtanio Nutri',
+                category: 'Cokelat',
+                weight: '1 Kg',
+                price: 27000,
+                rating: 4.7,
+                sold: '940 terjual',
+                imageBg: 'from-amber-100 to-yellow-900/20',
+                textColor: 'text-amber-900',
+                badgeBg: 'bg-amber-200 text-amber-900',
+                badgeText: 'Beras Cokelat',
+                originCode: 'SRT-BWG-04',
+                originName: 'Klaster Gambiran, Banyuwangi',
+                farmerGroup: 'Kelompok Tani Sri Rejeki Gambiran',
+                harvestDate: 'September 2026',
+                description: 'Beras pecah kulit dengan lapisan aleuron utuh. Mempertahankan kandungan nutrisi mineral tinggi, lezat, dan mengenyangkan lebih lama.'
+            }
+        ];
+
+        // --- TRACEABILITY DATABASE DETAILS ---
+        const traceabilityData = {
+            'SRT-BWG-01': {
+                cluster: 'Klaster Rogojampi, Banyuwangi',
+                coordinates: '-8.3094° S, 114.2982° E',
+                farmerGroup: 'Kelompok Tani Subur Makmur (Ketua: Bpk. H. Slamet)',
+                altitude: '145 mdpl (Dataran Subur Aluvial Sungai Bango)',
+                seedType: 'Ciherang Organik Bersertifikat',
+                waterSource: 'Irigasi Mata Air Alami Pegunungan Ijen',
+                soilType: 'Andosol Vulkanik Kaya Hara',
+                millingDate: '28 Oktober 2026',
+                labStatus: 'Lulus Uji Laboratorium Bebas Residu Pestisida (SNI 6729:2016)'
+            },
+            'SRT-BWG-02': {
+                cluster: 'Klaster Srono, Banyuwangi',
+                coordinates: '-8.3751° S, 114.2486° E',
+                farmerGroup: 'Kelompok Tani Tani Makmur Srono (Ketua: Ibu Siti Aminah)',
+                altitude: '98 mdpl (Dataran Rendah Subur)',
+                seedType: 'Varietas Lokal Mentik Wangi Merah Organik',
+                waterSource: 'Saluran Irigasi Teknis Kalibaru',
+                soilType: 'Regosol Subur Organik',
+                millingDate: '25 Oktober 2026',
+                labStatus: 'Lulus Uji Laboratorium Bebas Residu Pestisida (SNI 6729:2016)'
+            },
+            'SRT-BWG-03': {
+                cluster: 'Klaster Cluring, Banyuwangi',
+                coordinates: '-8.4122° S, 114.2155° E',
+                farmerGroup: 'Gapoktan Cluring Lestari (Ketua: Bpk. Sugeng Riyadi)',
+                altitude: '110 mdpl',
+                seedType: 'Padi Hitam Varietas Melik Organik Murni',
+                waterSource: 'Mata Air Alami Sumber Sraten',
+                soilType: 'Latosol Vulkanik Hitam',
+                millingDate: '27 Oktober 2026',
+                labStatus: 'Lulus Uji Laboratorium Bebas Residu Pestisida (SNI 6729:2016)'
+            },
+            'SRT-BWG-04': {
+                cluster: 'Klaster Gambiran, Banyuwangi',
+                coordinates: '-8.3912° S, 114.1822° E',
+                farmerGroup: 'Kelompok Tani Sri Rejeki Gambiran (Ketua: Bpk. Joko Widodo)',
+                altitude: '85 mdpl',
+                seedType: 'Padi Cokelat Pecah Kulit Organik',
+                waterSource: 'Irigasi Teknis Daerah Aliran Sungai Stail',
+                soilType: 'Aluvial Subur',
+                millingDate: '26 Oktober 2026',
+                labStatus: 'Lulus Uji Laboratorium Bebas Residu Pestisida (SNI 6729:2016)'
+            }
+        };
+
+        // --- APP STATE ---
+        let cart = [];
+        let orders = [
+            {
+                id: 'SRT-ORD-9821',
+                date: '28 Oktober 2026',
+                items: [{ ...products[1], quantity: 2 }],
+                total: 65000,
+                status: 'Selesai & Dikirim',
+                originCode: 'SRT-BWG-02',
+                originName: 'Klaster Srono, Banyuwangi'
+            }
+        ];
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products);
+            renderCart();
+            renderOrders();
+            runTraceability(); // Default load
+        });
+
+        // --- NAVIGATION TABS ---
+        function switchTab(tabName) {
+            const tabs = ['catalog', 'traceability', 'orders'];
+            tabs.forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    section.classList.remove('hidden');
+                    if(navBtn) {
+                        navBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all text-sirtanio-700 bg-white shadow-xs";
+                    }
+                } else {
+                    section.classList.add('hidden');
+                    if(navBtn) {
+                        navBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-600 hover:text-sirtanio-700";
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- RENDER CATALOG & FILTER ---
+        function renderProducts(list) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            
+            list.forEach(p => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-3xl p-5 border border-sirtanio-100 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between group">
+                        <div class="space-y-4">
+                            <div class="h-44 rounded-2xl bg-gradient-to-br ${p.imageBg} flex items-center justify-center relative overflow-hidden shadow-inner">
+                                <span class="absolute top-3 left-3 ${p.badgeBg} text-xs font-bold px-3 py-1 rounded-full shadow-xs">
+                                    ${p.badgeText}
+                                </span>
+                                <div class="absolute bottom-3 right-3 text-xs bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-lg font-bold text-gray-700 flex items-center shadow-xs">
+                                    <i class="fa-solid fa-weight-scale text-sirtanio-600 mr-1.5"></i> ${p.weight}
+                                </div>
+                                <i class="fa-solid fa-wheat-awn text-5xl ${p.textColor} opacity-80 group-hover:scale-110 transition-transform duration-300"></i>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                                    <span class="flex items-center text-amber-500 font-bold">
+                                        <i class="fa-solid fa-star mr-1"></i> ${p.rating}
+                                    </span>
+                                    <span>${p.sold}</span>
+                                </div>
+                                <h4 class="font-bold text-base text-sirtanio-800 line-clamp-1">${p.name}</h4>
+                                <p class="text-xs text-gray-600 mt-1 line-clamp-2">${p.description}</p>
+                            </div>
+
+                            <div class="bg-sirtanio-50/70 p-2.5 rounded-xl text-xs text-gray-600 flex items-center space-x-2 border border-sirtanio-100">
+                                <i class="fa-solid fa-map-pin text-sirtanio-600 flex-shrink-0"></i>
+                                <span class="truncate">Asal: ${p.originName}</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-5 mt-4 border-t border-gray-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 block">Harga</span>
+                                <span class="text-base font-extrabold text-sirtanio-800">Rp ${p.price.toLocaleString('id-ID')}</span>
+                            </div>
+                            <button onclick="addToCart('${p.id}')" class="bg-sirtanio-600 hover:bg-sirtanio-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all shadow-sm flex items-center space-x-1.5 active:scale-95">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>+ Keranjang</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterProducts(category) {
+            // Update filter button styles
+            const categories = ['all', 'Putih', 'Merah', 'Hitam', 'Cokelat'];
+            categories.forEach(c => {
+                const btn = document.getElementById(`filter-${c}`);
+                if(btn) {
+                    if(c === category) {
+                        btn.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-sirtanio-600 text-white";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-lg text-xs font-medium text-gray-600 hover:text-sirtanio-600";
+                    }
+                }
+            });
+
+            if (category === 'all') {
+                renderProducts(products);
+            } else {
+                const filtered = products.filter(p => p.category === category);
+                renderProducts(filtered);
+            }
+        }
+
+        // --- CART MANAGEMENT ---
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+            
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCartBadge();
+            renderCart();
+            
+            // Show brief visual feedback notification
+            showNotification("Berhasil Ditambahkan", `${product.name} berhasil dimasukkan ke keranjang belanja Anda.`);
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== productId);
+                }
+            }
+            updateCartBadge();
+            renderCart();
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.innerText = totalCount;
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const subtotalEl = document.getElementById('cart-subtotal');
+            const totalEl = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 space-y-3">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400 text-2xl">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <p class="text-sm font-bold text-gray-700">Keranjang Belanja Masih Kosong</p>
+                        <p class="text-xs text-gray-500">Silakan pilih varian beras organik terbaik dari katalog.</p>
+                    </div>
+                `;
+                subtotalEl.innerText = 'Rp 0';
+                totalEl.innerText = 'Rp 15.000';
+                return;
+            }
+
+            container.innerHTML = '';
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-sirtanio-50/50 p-3 rounded-2xl border border-sirtanio-100">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-sirtanio-100 rounded-xl flex items-center justify-center text-sirtanio-800 font-bold">
+                                <i class="fa-solid fa-wheat-awn text-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-sirtanio-800 line-clamp-1">${item.name}</h5>
+                                <span class="text-xs text-gray-500">Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity('${item.id}', -1)" class="w-7 h-7 bg-white rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-100">
+                                <i class="fa-solid fa-minus text-xs"></i>
+                            </button>
+                            <span class="text-sm font-bold w-5 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity('${item.id}', 1)" class="w-7 h-7 bg-white rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-100">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const total = subtotal + 15000;
+            subtotalEl.innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            totalEl.innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function openCartModal() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function checkoutCart() {
+            if (cart.length === 0) {
+                showNotification("Keranjang Kosong", "Tambahkan minimal 1 produk beras ke keranjang sebelum melakukan pemesanan.");
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const newOrder = {
+                id: 'SRT-ORD-' + Math.floor(1000 + Math.random() * 9000),
+                date: 'Hari Ini, 2026',
+                items: [...cart],
+                total: subtotal + 15000,
+                status: 'Diproses Petani Organik',
+                originCode: cart[0].originCode,
+                originName: cart[0].originName
+            };
+
+            orders.unshift(newOrder);
+            cart = [];
+            updateCartBadge();
+            renderCart();
+            renderOrders();
+            closeCartModal();
+
+            showNotification("Pesanan Berhasil Disimpan!", `Nomor Pesanan ${newOrder.id} berhasil dibuat. Asal usul beras telah tercatat otomatis dalam sistem traceability.`);
+        }
+
+        // --- TRACEABILITY FEATURE ---
+        function runTraceability() {
+            const selectVal = document.getElementById('trace-select').value;
+            const data = traceabilityData[selectVal];
+            const container = document.getElementById('trace-result-container');
+
+            if (!data) return;
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-sirtanio-50/60 p-6 rounded-3xl border border-sirtanio-100">
+                    <div class="space-y-4 md:col-span-1 border-b md:border-b-0 md:border-r border-sirtanio-200 pb-4 md:pb-0 md:pr-6">
+                        <div class="w-12 h-12 bg-sirtanio-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-md">
+                            <i class="fa-solid fa-location-crosshairs"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-sirtanio-600 uppercase tracking-wider">Wilayah Sawah</span>
+                            <h3 class="font-extrabold text-lg text-sirtanio-800">${data.cluster}</h3>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-map-pin mr-1"></i> Koordinat GPS: ${data.coordinates}</p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-2xl border border-sirtanio-100 space-y-1">
+                            <span class="text-[10px] font-bold uppercase text-gray-400">Ketinggian Lokasi</span>
+                            <p class="text-xs font-bold text-gray-800">${data.altitude}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 md:col-span-2">
+                        <h4 class="font-bold text-sm text-sirtanio-800 uppercase tracking-wide flex items-center">
+                            <i class="fa-solid fa-clipboard-check text-sirtanio-600 mr-2"></i> Detail Kelompok Tani & Kualitas
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-white p-3.5 rounded-2xl border border-sirtanio-100 space-y-1">
+                                <span class="text-[10px] font-bold uppercase text-gray-400">Kelompok Tani Produsen</span>
+                                <p class="text-xs font-bold text-gray-800">${data.farmerGroup}</p>
+                            </div>
+                            <div class="bg-white p-3.5 rounded-2xl border border-sirtanio-100 space-y-1">
+                                <span class="text-[10px] font-bold uppercase text-gray-400">Varietas Benih</span>
+                                <p class="text-xs font-bold text-gray-800">${data.seedType}</p>
+                            </div>
+                            <div class="bg-white p-3.5 rounded-2xl border border-sirtanio-100 space-y-1">
+                                <span class="text-[10px] font-bold uppercase text-gray-400">Sumber Air Irigasi</span>
+                                <p class="text-xs font-bold text-gray-800">${data.waterSource}</p>
+                            </div>
+                            <div class="bg-white p-3.5 rounded-2xl border border-sirtanio-100 space-y-1">
+                                <span class="text-[10px] font-bold uppercase text-gray-400">Tanggal Penggilingan</span>
+                                <p class="text-xs font-bold text-gray-800">${data.millingDate}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl flex items-start space-x-3">
+                            <i class="fa-solid fa-shield-halved text-emerald-600 text-lg mt-0.5"></i>
+                            <div>
+                                <span class="text-xs font-bold text-emerald-900 block">Status Laboratorium Organik</span>
+                                <p class="text-xs text-emerald-700 mt-0.5">${data.labStatus}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- ORDERS & REORDER FEATURE ---
+        function renderOrders() {
+            const container = document.getElementById('orders-list-container');
+            const countEl = document.getElementById('total-orders-count');
+            countEl.innerText = orders.length;
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 space-y-3">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400 text-2xl">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <p class="text-sm font-bold text-gray-700">Belum Ada Riwayat Pesanan</p>
+                        <p class="text-xs text-gray-500">Lakukan simulasi pemesanan untuk melihat fitur reorder cepat di sini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            orders.forEach(order => {
+                const itemsListHtml = order.items.map(i => `<span class="inline-block bg-sirtanio-50 text-sirtanio-800 text-xs font-bold px-2.5 py-1 rounded-lg border border-sirtanio-100 mr-2 mb-1">${i.name} (${i.quantity}x)</span>`).join('');
+                
+                container.innerHTML += `
+                    <div class="bg-white rounded-3xl p-5 border border-sirtanio-100 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-gray-100">
+                            <div>
+                                <span class="text-xs font-bold text-sirtanio-600">${order.id}</span>
+                                <span class="text-xs text-gray-400 ml-2">${order.date}</span>
+                            </div>
+                            <span class="bg-emerald-100 text-sirtanio-800 text-xs font-bold px-3 py-1 rounded-full w-fit">
+                                ${order.status}
+                            </span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold text-gray-500 block">Produk Beras:</span>
+                            <div>${itemsListHtml}</div>
+                        </div>
+
+                        <div class="bg-sirtanio-50/50 p-3 rounded-2xl border border-sirtanio-100 flex items-center justify-between text-xs">
+                            <div class="flex items-center space-x-2 text-gray-600">
+                                <i class="fa-solid fa-map-pin text-sirtanio-600"></i>
+                                <span>Asal Sawah: <strong class="text-sirtanio-800">${order.originName}</strong></span>
+                            </div>
+                            <button onclick="inspectOrigin('${order.originCode}')" class="text-sirtanio-600 hover:underline font-bold">
+                                Lacak Asal <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-2">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 block">Total Biaya</span>
+                                <span class="text-base font-extrabold text-sirtanio-800">Rp ${order.total.toLocaleString('id-ID')}</span>
+                            </div>
+                            <button onclick="reorderItems(${JSON.stringify(order.items).replace(/"/g, '&quot;')})" class="bg-sirtanio-600 hover:bg-sirtanio-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-sm flex items-center space-x-2 active:scale-95">
+                                <i class="fa-solid fa-rotate-right"></i>
+                                <span>Reorder Cepat</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function inspectOrigin(code) {
+            document.getElementById('trace-select').value = code;
+            switchTab('traceability');
+            runTraceability();
+        }
+
+        function reorderItems(orderItems) {
+            orderItems.forEach(item => {
+                const existing = cart.find(i => i.id === item.id);
+                if (existing) {
+                    existing.quantity += item.quantity;
+                } else {
+                    cart.push({ ...item });
+                }
+            });
+            updateCartBadge();
+            renderCart();
+            openCartModal();
+            showNotification("Reorder Berhasil Dimuat", "Produk dari pesanan sebelumnya telah dimasukkan kembali ke keranjang belanja.");
+        }
+
+        // --- NOTIFICATION MODAL HELPERS ---
+        function showNotification(title, message) {
+            document.getElementById('notif-title').innerText = title;
+            document.getElementById('notif-message').innerText = message;
+            document.getElementById('notification-modal').classList.remove('hidden');
+        }
+
+        function closeNotificationModal() {
+            document.getElementById('notification-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
